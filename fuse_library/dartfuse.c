@@ -6,7 +6,7 @@
 #include <errno.h>
 #include "dartfuse.h"
 
-typedef int (*dartcb)(int);
+typedef int (*dartcb)(const char *path);
 
 static dartcb dartCallbackA;
 
@@ -18,8 +18,6 @@ void hello_world()
 void set_callback(dartcb dartfn)
 {
     dartCallbackA = dartfn;
-    int r = dartCallbackA(22);
-    printf("native got result from Dart callback: %d \n", r);
 }
 
 // example code from: https://github.com/fntlnz/fuse-example
@@ -30,7 +28,8 @@ static const char *filecontent = "I'm the content of the only file available the
 
 static int getattr_callback(const char *path, struct stat *stbuf)
 {
-    dartCallbackA(101);
+    int r = dartCallbackA(path);
+    printf("native got result from Dart callback: %d \n", r);
 
     memset(stbuf, 0, sizeof(struct stat));
 

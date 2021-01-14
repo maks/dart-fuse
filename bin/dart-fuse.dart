@@ -1,28 +1,30 @@
-import 'dart:ffi';
+import 'dart:ffi' as ffi;
 import 'dart:io';
 
 import 'package:ffi/ffi.dart';
 
 // FFI signature of the hello_world C function
-typedef hello_world_func = Void Function();
+typedef hello_world_func = ffi.Void Function();
 // Dart type definition for calling the C foreign function
 typedef HelloWorld = void Function();
 
 // FFI signature of the set_callback C function
-typedef NativeCbFunc = Void Function(Pointer<NativeFunction<Callback>>);
+typedef NativeCbFunc = ffi.Void Function(
+    ffi.Pointer<ffi.NativeFunction<Callback>>);
 // Dart type definition for the set_callback function
-typedef CbFunc = void Function(Pointer<NativeFunction<Callback>>);
+typedef CbFunc = void Function(ffi.Pointer<ffi.NativeFunction<Callback>>);
 
-typedef Callback = Int32 Function(Int32 a);
+typedef Callback = ffi.Int32 Function(ffi.Pointer<Utf8> a);
 
-int callbackFromNative(int a) {
-  print('Dart received: $a from native');
-  return a + 1;
+int callbackFromNative(ffi.Pointer<Utf8> path) {
+  final dartPath = Utf8.fromUtf8(path);
+  print('Dart received: $dartPath from native');
+  return 1;
 }
 
 // FUSE init ==
 // FFI signature of the hello_world C function
-typedef fuse_init_func = Void Function();
+typedef fuse_init_func = ffi.Void Function();
 // Dart type definition for calling the C foreign function
 typedef FuseInit = void Function();
 // == FUSE init
@@ -37,13 +39,13 @@ void main(List<String> arguments) {
 
   final path = './fuse_library/build/libdartfuse.so';
 
-  final dylib = DynamicLibrary.open(path);
+  final dylib = ffi.DynamicLibrary.open(path);
 
   // ignore: omit_local_variable_types
   final CbFunc setCallback =
       dylib.lookupFunction<NativeCbFunc, CbFunc>('set_callback');
 
-  setCallback(Pointer.fromFunction(callbackFromNative, 0));
+  setCallback(ffi.Pointer.fromFunction(callbackFromNative, 0));
 
   // ignore: omit_local_variable_types
   final FuseInit fuseInit =
