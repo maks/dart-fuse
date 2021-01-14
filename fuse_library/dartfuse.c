@@ -6,9 +6,20 @@
 #include <errno.h>
 #include "dartfuse.h"
 
+typedef int (*dartcb)(int);
+
+static dartcb dartCallbackA;
+
 void hello_world()
 {
     printf("Hello World from C\n");
+}
+
+void set_callback(dartcb dartfn)
+{
+    dartCallbackA = dartfn;
+    int r = dartCallbackA(22);
+    printf("native got result from Dart callback: %d \n", r);
 }
 
 // example code from: https://github.com/fntlnz/fuse-example
