@@ -1,3 +1,5 @@
 LIBRARY   fuse
 EXPORTS
    hello_world
+   set_callback
+   fuse_init

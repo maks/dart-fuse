@@ -101,7 +101,21 @@ static struct fuse_operations fuse_example_operations = {
     .readdir = readdir_callback,
 };
 
+void fuse_init()
+{
+    printf("fuse init");
+    int argc = 5;
+    char *argv[5];
+    argv[0] = "fusedart";
+    argv[1] = "-d";
+    argv[2] = "-s";
+    argv[3] = "-f";
+    argv[4] = "/tmp/example";
+    fuse_main(argc, argv, &fuse_example_operations, NULL);
+}
+
 int main(int argc, char *argv[])
 {
-    return fuse_main(argc, argv, &fuse_example_operations, NULL);
+    printf("argc: %d", argc);
+    // return fuse_main(argc, argv, &fuse_example_operations, NULL);
 }
