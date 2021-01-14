@@ -30,6 +30,8 @@ static const char *filecontent = "I'm the content of the only file available the
 
 static int getattr_callback(const char *path, struct stat *stbuf)
 {
+    dartCallbackA(101);
+
     memset(stbuf, 0, sizeof(struct stat));
 
     if (strcmp(path, "/") == 0)
