@@ -10,11 +10,6 @@ typedef int (*dartcb)(const char *path);
 
 static dartcb dartCallbackA;
 
-void hello_world()
-{
-    printf("Hello World from C\n");
-}
-
 void set_callback(dartcb dartfn)
 {
     dartCallbackA = dartfn;
@@ -117,6 +112,5 @@ void fuse_init()
 
 int main(int argc, char *argv[])
 {
-    printf("argc: %d", argc);
-    // return fuse_main(argc, argv, &fuse_example_operations, NULL);
+    return fuse_main(argc, argv, &fuse_example_operations, NULL);
 }
