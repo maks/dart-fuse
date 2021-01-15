@@ -4,11 +4,11 @@
 
 ## Status
 
-[] Pass in command line args to Fuse main()
-[] Library structure and example working for: getattr
-[] Minimal implementation: open, read, readdir
-[] Implement more common operations: create, write, unlink, mkdir, rmdir, release, rename, truncate, destroy 
-[] Full API from [fuse.h](http://libfuse.github.io/doxygen/structfuse__operations.html)
+- [x] Pass in command line args to Fuse main()
+- [ ] Library structure and example working for: getattr
+- [ ] Minimal implementation: open, read, readdir
+- [ ] Implement more common operations: create, write, unlink, mkdir, rmdir, release, rename, truncate, destroy 
+- [ ] Full API from [fuse.h](http://libfuse.github.io/doxygen/structfuse__operations.html)
 
 
 # References
@@ -25,6 +25,8 @@
 [This issue comment actually had one of the best, clearest examples of code to do callback into Dart from C](https://github.com/dart-lang/sdk/issues/37301#issuecomment-602197373), more so than the [example code in the issue that tracked callback implementation.](https://github.com/dart-lang/sdk/issues/35761#issue-403159732)
 
 [Practical example of using existing C library including setup for mobile](https://medium.com/flutter-community/integrating-c-library-in-a-flutter-app-using-dart-ffi-38a15e16bc14)
+
+[How to pass String arrays from Dart to C](https://github.com/dart-lang/sdk/issues/43403)
 
 ## CMake
 

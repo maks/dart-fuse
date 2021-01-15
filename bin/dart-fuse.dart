@@ -18,9 +18,10 @@ int callbackFromNative(ffi.Pointer<Utf8> path) {
 }
 
 // FFI signature of the fuse_init C function
-typedef fuse_init_func = ffi.Void Function();
+typedef fuse_init_func = ffi.Void Function(
+    ffi.Int32 argc, ffi.Pointer<ffi.Pointer<Utf8>> argv);
 // Dart type definition for calling the C foreign function
-typedef FuseInit = void Function();
+typedef FuseInit = void Function(int argc, ffi.Pointer<ffi.Pointer<Utf8>> argv);
 
 void main(List<String> arguments) {
   print('dart-fuse started');
@@ -44,5 +45,18 @@ void main(List<String> arguments) {
   final FuseInit fuseInit =
       dylib.lookupFunction<fuse_init_func, FuseInit>('fuse_init');
 
-  fuseInit();
+  fuseInit(arguments.length, convertForFFI(arguments));
+}
+
+ffi.Pointer<ffi.Pointer<Utf8>> convertForFFI(List<String> strings) {
+  // ignore: omit_local_variable_types
+  final List<ffi.Pointer<Utf8>> stringPointers =
+      strings.map(Utf8.toUtf8).toList();
+  // ignore: omit_local_variable_types
+  final ffi.Pointer<ffi.Pointer<Utf8>> pointerToStringPointers =
+      allocate(count: stringPointers.length);
+  for (var i = 0; i < strings.length; i++) {
+    pointerToStringPointers[i] = stringPointers[i];
+  }
+  return pointerToStringPointers;
 }
