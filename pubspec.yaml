@@ -1,6 +1,6 @@
 name: dart_fuse
 description: Dart FFI bindings for FUSE
-version: 0.0.1
+version: 0.0.1-nullsafety.1
 homepage: https://github.com/maks/dart_fuse
 
 environment:
