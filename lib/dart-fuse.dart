@@ -16,7 +16,7 @@ int callbackFromNative(int op, ffi.Pointer<Utf8> path) {
   final operation = FuseOp.values[op];
   switch (operation) {
     case FuseOp.GetAttr:
-      DartFuse._singleton.getAttributes?.call(dartPath);
+      DartFuse().getAttributes.call(dartPath);
       break;
     case FuseOp.Open:
       // TODO: Handle this case.
@@ -40,13 +40,13 @@ typedef FuseInit = void Function(int argc, ffi.Pointer<ffi.Pointer<Utf8>> argv);
 class DartFuse {
   final Function(String path) getAttributes;
 
-  static DartFuse _singleton;
+  static DartFuse? _singleton;
 
-  DartFuse._({this.getAttributes});
+  DartFuse._({required this.getAttributes});
 
   factory DartFuse({getAttributes}) {
     _singleton ??= DartFuse._(getAttributes: getAttributes);
-    return _singleton;
+    return _singleton!; //compiler can't be abs sure if wont be null, but we know it can't due to line above
   }
 
   void init(List<String> arguments) {
