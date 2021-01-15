@@ -4,6 +4,8 @@
 
 ## Status
 
+### **DO NOT USE, STILL WORK IN PROGRESS!**
+
 - [x] Pass in command line args to Fuse main()
 - [x] Library structure and example working for: getattr
 - [ ] Minimal implementation: open, read, readdir
