@@ -8,12 +8,26 @@ typedef NativeCbFunc = ffi.Void Function(
 // Dart type definition for the set_callback function
 typedef CbFunc = void Function(ffi.Pointer<ffi.NativeFunction<Callback>>);
 
-typedef Callback = ffi.Int32 Function(ffi.Pointer<Utf8> a);
+typedef Callback = ffi.Int32 Function(ffi.Int32 op, ffi.Pointer<Utf8> path);
 
-int callbackFromNative(ffi.Pointer<Utf8> path) {
+int callbackFromNative(int op, ffi.Pointer<Utf8> path) {
   final dartPath = Utf8.fromUtf8(path);
-  print('Dart received: $dartPath from native');
-  DartFuse._singleton.getAttributes?.call(dartPath);
+  print('Dart received: [$op] $dartPath from native');
+  final operation = FuseOp.values[op];
+  switch (operation) {
+    case FuseOp.GetAttr:
+      DartFuse._singleton.getAttributes?.call(dartPath);
+      break;
+    case FuseOp.Open:
+      // TODO: Handle this case.
+      break;
+    case FuseOp.Read:
+      // TODO: Handle this case.
+      break;
+    case FuseOp.ReadDir:
+      // TODO: Handle this case.
+      break;
+  }
   return 1;
 }
 
@@ -76,4 +90,11 @@ class FileAttributes {
 // from: linux kernels errno.h
 class FileErrors {
   static const ENOENT = 2;
+}
+
+enum FuseOp {
+  GetAttr,
+  Open,
+  Read,
+  ReadDir,
 }

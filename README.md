@@ -5,7 +5,7 @@
 ## Status
 
 - [x] Pass in command line args to Fuse main()
-- [ ] Library structure and example working for: getattr
+- [x] Library structure and example working for: getattr
 - [ ] Minimal implementation: open, read, readdir
 - [ ] Implement more common operations: create, write, unlink, mkdir, rmdir, release, rename, truncate, destroy 
 - [ ] Full API from [fuse.h](http://libfuse.github.io/doxygen/structfuse__operations.html)

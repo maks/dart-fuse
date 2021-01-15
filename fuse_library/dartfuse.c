@@ -6,13 +6,19 @@
 #include <errno.h>
 #include "dartfuse.h"
 
-typedef int (*dartcb)(const char *path);
+// MUST match FuseOp enum on Dart side
+#define GETATTROP 1
+#define OPEN 2
+#define READ 3
+#define READDIR 4
 
-static dartcb dartCallbackA;
+typedef int (*dartcb)(int op, const char *path);
+
+static dartcb dartOpCallback;
 
 void set_callback(dartcb dartfn)
 {
-    dartCallbackA = dartfn;
+    dartOpCallback = dartfn;
 }
 
 // example code from: https://github.com/fntlnz/fuse-example
@@ -23,7 +29,7 @@ static const char *filecontent = "I'm the content of the only file available the
 
 static int getattr_callback(const char *path, struct stat *stbuf)
 {
-    int r = dartCallbackA(path);
+    int r = dartOpCallback(GETATTROP, path);
     printf("native got result from Dart callback: %d \n", r);
 
     memset(stbuf, 0, sizeof(struct stat));
