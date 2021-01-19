@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:dart_fuse/dart-fuse.dart';
+import 'package:dart_fuse/dart_fuse.dart';
 
 void main(List<String> arguments) {
   ProcessSignal.sigint.watch().listen((signal) {

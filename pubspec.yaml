@@ -11,3 +11,35 @@ dependencies:
 
 dev_dependencies:
   pedantic: ^1.10.0-nullsafety.3
+  ffigen: 2.0.0-dev.4
+
+ffigen:
+  output: "generated_bindings.dart"
+  name: "DartFuse"
+  description: "Bindings to libfuse"
+  headers:
+    entry-points:
+      - "fuse.h"
+    include-directives:
+      - "fuse.h"
+  array-workaround: true
+  structs:
+    exclude:
+      - fuse_context
+  enums:
+    rename:
+      "_(.*)": "$1" # Removes prefix underscores from all structures.
+    member-rename:
+      ".*": # Matches any struct.
+        "_(.*)": "$1" # Removes prefix underscores from members.
+  functions:
+    exclude:
+      - stat
+      - statvfs
+      - fuse_main_real
+      - fuse_get_context
+      - fuse_set_context
+      - fuse_set_getcontext_func
+  llvm-lib: /usr/lib
+  preamble: |
+    // ignore_for_file: unused_element, unused_field
