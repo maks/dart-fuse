@@ -22,6 +22,7 @@ ffigen:
       - "fuse.h"
     include-directives:
       - "fuse.h"
+      - "/usr/include/fuse/fuse_common.h"
   array-workaround: true
   structs:
     exclude:

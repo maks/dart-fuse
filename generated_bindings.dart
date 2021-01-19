@@ -13,6 +13,197 @@ class DartFuse {
   /// The symbols are looked up in [dynamicLibrary].
   DartFuse(ffi.DynamicLibrary dynamicLibrary) : _dylib = dynamicLibrary;
 
+  /// Create a FUSE mountpoint
+  ///
+  /// Returns a control file descriptor suitable for passing to
+  /// fuse_new()
+  ///
+  /// @param mountpoint the mount point path
+  /// @param args argument vector
+  /// @return the communication channel on success, NULL on failure
+  ffi.Pointer<fuse_chan> fuse_mount(
+    ffi.Pointer<ffi.Int8> mountpoint,
+    ffi.Pointer<fuse_args> args,
+  ) {
+    return (_fuse_mount ??=
+        _dylib.lookupFunction<_c_fuse_mount, _dart_fuse_mount>('fuse_mount'))(
+      mountpoint,
+      args,
+    );
+  }
+
+  _dart_fuse_mount? _fuse_mount;
+
+  /// Umount a FUSE mountpoint
+  ///
+  /// @param mountpoint the mount point path
+  /// @param ch the communication channel
+  void fuse_unmount(
+    ffi.Pointer<ffi.Int8> mountpoint,
+    ffi.Pointer<fuse_chan> ch,
+  ) {
+    return (_fuse_unmount ??= _dylib
+        .lookupFunction<_c_fuse_unmount, _dart_fuse_unmount>('fuse_unmount'))(
+      mountpoint,
+      ch,
+    );
+  }
+
+  _dart_fuse_unmount? _fuse_unmount;
+
+  /// Parse common options
+  ///
+  /// The following options are parsed:
+  ///
+  /// '-f'	     foreground
+  /// '-d' '-odebug'  foreground, but keep the debug option
+  /// '-s'	     single threaded
+  /// '-h' '--help'   help
+  /// '-ho'	     help without header
+  /// '-ofsname=..'   file system name, if not present, then set to the program
+  /// name
+  ///
+  /// All parameters may be NULL
+  ///
+  /// @param args argument vector
+  /// @param mountpoint the returned mountpoint, should be freed after use
+  /// @param multithreaded set to 1 unless the '-s' option is present
+  /// @param foreground set to 1 if one of the relevant options is present
+  /// @return 0 on success, -1 on failure
+  int fuse_parse_cmdline(
+    ffi.Pointer<fuse_args> args,
+    ffi.Pointer<ffi.Pointer<ffi.Int8>> mountpoint,
+    ffi.Pointer<ffi.Int32> multithreaded,
+    ffi.Pointer<ffi.Int32> foreground,
+  ) {
+    return (_fuse_parse_cmdline ??=
+        _dylib.lookupFunction<_c_fuse_parse_cmdline, _dart_fuse_parse_cmdline>(
+            'fuse_parse_cmdline'))(
+      args,
+      mountpoint,
+      multithreaded,
+      foreground,
+    );
+  }
+
+  _dart_fuse_parse_cmdline? _fuse_parse_cmdline;
+
+  /// Go into the background
+  ///
+  /// @param foreground if true, stay in the foreground
+  /// @return 0 on success, -1 on failure
+  int fuse_daemonize(
+    int foreground,
+  ) {
+    return (_fuse_daemonize ??=
+        _dylib.lookupFunction<_c_fuse_daemonize, _dart_fuse_daemonize>(
+            'fuse_daemonize'))(
+      foreground,
+    );
+  }
+
+  _dart_fuse_daemonize? _fuse_daemonize;
+
+  /// Get the version of the library
+  ///
+  /// @return the version
+  int fuse_version() {
+    return (_fuse_version ??= _dylib
+        .lookupFunction<_c_fuse_version, _dart_fuse_version>('fuse_version'))();
+  }
+
+  _dart_fuse_version? _fuse_version;
+
+  /// Destroy poll handle
+  ///
+  /// @param ph the poll handle
+  void fuse_pollhandle_destroy(
+    ffi.Pointer<fuse_pollhandle> ph,
+  ) {
+    return (_fuse_pollhandle_destroy ??= _dylib.lookupFunction<
+        _c_fuse_pollhandle_destroy,
+        _dart_fuse_pollhandle_destroy>('fuse_pollhandle_destroy'))(
+      ph,
+    );
+  }
+
+  _dart_fuse_pollhandle_destroy? _fuse_pollhandle_destroy;
+
+  /// Get total size of data in a fuse buffer vector
+  ///
+  /// @param bufv buffer vector
+  /// @return size of data
+  int fuse_buf_size(
+    ffi.Pointer<fuse_bufvec> bufv,
+  ) {
+    return (_fuse_buf_size ??=
+        _dylib.lookupFunction<_c_fuse_buf_size, _dart_fuse_buf_size>(
+            'fuse_buf_size'))(
+      bufv,
+    );
+  }
+
+  _dart_fuse_buf_size? _fuse_buf_size;
+
+  /// Copy data from one buffer vector to another
+  ///
+  /// @param dst destination buffer vector
+  /// @param src source buffer vector
+  /// @param flags flags controlling the copy
+  /// @return actual number of bytes copied or -errno on error
+  int fuse_buf_copy(
+    ffi.Pointer<fuse_bufvec> dst,
+    ffi.Pointer<fuse_bufvec> src,
+    int flags,
+  ) {
+    return (_fuse_buf_copy ??=
+        _dylib.lookupFunction<_c_fuse_buf_copy, _dart_fuse_buf_copy>(
+            'fuse_buf_copy'))(
+      dst,
+      src,
+      flags,
+    );
+  }
+
+  _dart_fuse_buf_copy? _fuse_buf_copy;
+
+  /// Exit session on HUP, TERM and INT signals and ignore PIPE signal
+  ///
+  /// Stores session in a global variable.	 May only be called once per
+  /// process until fuse_remove_signal_handlers() is called.
+  ///
+  /// @param se the session to exit
+  /// @return 0 on success, -1 on failure
+  int fuse_set_signal_handlers(
+    ffi.Pointer<fuse_session> se,
+  ) {
+    return (_fuse_set_signal_handlers ??= _dylib.lookupFunction<
+        _c_fuse_set_signal_handlers,
+        _dart_fuse_set_signal_handlers>('fuse_set_signal_handlers'))(
+      se,
+    );
+  }
+
+  _dart_fuse_set_signal_handlers? _fuse_set_signal_handlers;
+
+  /// Restore default signal handlers
+  ///
+  /// Resets global session.  After this fuse_set_signal_handlers() may
+  /// be called again.
+  ///
+  /// @param se the same session as given in fuse_set_signal_handlers()
+  void fuse_remove_signal_handlers(
+    ffi.Pointer<fuse_session> se,
+  ) {
+    return (_fuse_remove_signal_handlers ??= _dylib.lookupFunction<
+        _c_fuse_remove_signal_handlers,
+        _dart_fuse_remove_signal_handlers>('fuse_remove_signal_handlers'))(
+      se,
+    );
+  }
+
+  _dart_fuse_remove_signal_handlers? _fuse_remove_signal_handlers;
+
   /// Create a new FUSE filesystem.
   ///
   /// @param ch the communication channel
@@ -255,7 +446,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     ffi.Pointer<stat> buf,
-    ffi.Pointer<fuse_file_info_1> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_fgetattr ??=
         _dylib.lookupFunction<_c_fuse_fs_fgetattr, _dart_fuse_fs_fgetattr>(
@@ -347,7 +538,7 @@ class DartFuse {
   int fuse_fs_release(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_2> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_release ??=
         _dylib.lookupFunction<_c_fuse_fs_release, _dart_fuse_fs_release>(
@@ -363,7 +554,7 @@ class DartFuse {
   int fuse_fs_open(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_3> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_open ??= _dylib
         .lookupFunction<_c_fuse_fs_open, _dart_fuse_fs_open>('fuse_fs_open'))(
@@ -381,7 +572,7 @@ class DartFuse {
     ffi.Pointer<ffi.Int8> buf,
     int size,
     int off,
-    ffi.Pointer<fuse_file_info_4> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_read ??= _dylib
         .lookupFunction<_c_fuse_fs_read, _dart_fuse_fs_read>('fuse_fs_read'))(
@@ -399,10 +590,10 @@ class DartFuse {
   int fuse_fs_read_buf(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<ffi.Pointer<fuse_bufvec_1>> bufp,
+    ffi.Pointer<ffi.Pointer<fuse_bufvec>> bufp,
     int size,
     int off,
-    ffi.Pointer<fuse_file_info_5> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_read_buf ??=
         _dylib.lookupFunction<_c_fuse_fs_read_buf, _dart_fuse_fs_read_buf>(
@@ -424,7 +615,7 @@ class DartFuse {
     ffi.Pointer<ffi.Int8> buf,
     int size,
     int off,
-    ffi.Pointer<fuse_file_info_6> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_write ??=
         _dylib.lookupFunction<_c_fuse_fs_write, _dart_fuse_fs_write>(
@@ -443,9 +634,9 @@ class DartFuse {
   int fuse_fs_write_buf(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_bufvec_2> buf,
+    ffi.Pointer<fuse_bufvec> buf,
     int off,
-    ffi.Pointer<fuse_file_info_7> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_write_buf ??=
         _dylib.lookupFunction<_c_fuse_fs_write_buf, _dart_fuse_fs_write_buf>(
@@ -464,7 +655,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     int datasync,
-    ffi.Pointer<fuse_file_info_8> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_fsync ??=
         _dylib.lookupFunction<_c_fuse_fs_fsync, _dart_fuse_fs_fsync>(
@@ -481,7 +672,7 @@ class DartFuse {
   int fuse_fs_flush(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_9> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_flush ??=
         _dylib.lookupFunction<_c_fuse_fs_flush, _dart_fuse_fs_flush>(
@@ -513,7 +704,7 @@ class DartFuse {
   int fuse_fs_opendir(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_10> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_opendir ??=
         _dylib.lookupFunction<_c_fuse_fs_opendir, _dart_fuse_fs_opendir>(
@@ -532,7 +723,7 @@ class DartFuse {
     ffi.Pointer<ffi.Void> buf,
     ffi.Pointer<ffi.NativeFunction<fuse_fill_dir_t>> filler,
     int off,
-    ffi.Pointer<fuse_file_info_11> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_readdir ??=
         _dylib.lookupFunction<_c_fuse_fs_readdir, _dart_fuse_fs_readdir>(
@@ -552,7 +743,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     int datasync,
-    ffi.Pointer<fuse_file_info_12> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_fsyncdir ??=
         _dylib.lookupFunction<_c_fuse_fs_fsyncdir, _dart_fuse_fs_fsyncdir>(
@@ -569,7 +760,7 @@ class DartFuse {
   int fuse_fs_releasedir(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_13> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_releasedir ??=
         _dylib.lookupFunction<_c_fuse_fs_releasedir, _dart_fuse_fs_releasedir>(
@@ -586,7 +777,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     int mode,
-    ffi.Pointer<fuse_file_info_14> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_create ??=
         _dylib.lookupFunction<_c_fuse_fs_create, _dart_fuse_fs_create>(
@@ -603,7 +794,7 @@ class DartFuse {
   int fuse_fs_lock(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_15> fi,
+    ffi.Pointer<fuse_file_info> fi,
     int cmd,
     ffi.Pointer<flock> lock,
   ) {
@@ -622,7 +813,7 @@ class DartFuse {
   int fuse_fs_flock(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_16> fi,
+    ffi.Pointer<fuse_file_info> fi,
     int op,
   ) {
     return (_fuse_fs_flock ??=
@@ -691,7 +882,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     int size,
-    ffi.Pointer<fuse_file_info_17> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_ftruncate ??=
         _dylib.lookupFunction<_c_fuse_fs_ftruncate, _dart_fuse_fs_ftruncate>(
@@ -869,7 +1060,7 @@ class DartFuse {
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
     int blocksize,
-    ffi.Pointer<ffi.Int32> idx,
+    ffi.Pointer<ffi.Uint64> idx,
   ) {
     return (_fuse_fs_bmap ??= _dylib
         .lookupFunction<_c_fuse_fs_bmap, _dart_fuse_fs_bmap>('fuse_fs_bmap'))(
@@ -887,7 +1078,7 @@ class DartFuse {
     ffi.Pointer<ffi.Int8> path,
     int cmd,
     ffi.Pointer<ffi.Void> arg,
-    ffi.Pointer<fuse_file_info_18> fi,
+    ffi.Pointer<fuse_file_info> fi,
     int flags,
     ffi.Pointer<ffi.Void> data,
   ) {
@@ -909,8 +1100,8 @@ class DartFuse {
   int fuse_fs_poll(
     ffi.Pointer<fuse_fs> fs,
     ffi.Pointer<ffi.Int8> path,
-    ffi.Pointer<fuse_file_info_19> fi,
-    ffi.Pointer<fuse_pollhandle_1> ph,
+    ffi.Pointer<fuse_file_info> fi,
+    ffi.Pointer<fuse_pollhandle> ph,
     ffi.Pointer<ffi.Uint32> reventsp,
   ) {
     return (_fuse_fs_poll ??= _dylib
@@ -931,7 +1122,7 @@ class DartFuse {
     int mode,
     int offset,
     int length,
-    ffi.Pointer<fuse_file_info_20> fi,
+    ffi.Pointer<fuse_file_info> fi,
   ) {
     return (_fuse_fs_fallocate ??=
         _dylib.lookupFunction<_c_fuse_fs_fallocate, _dart_fuse_fs_fallocate>(
@@ -949,7 +1140,7 @@ class DartFuse {
 
   void fuse_fs_init(
     ffi.Pointer<fuse_fs> fs,
-    ffi.Pointer<fuse_conn_info_1> conn,
+    ffi.Pointer<fuse_conn_info> conn,
   ) {
     return (_fuse_fs_init ??= _dylib
         .lookupFunction<_c_fuse_fs_init, _dart_fuse_fs_init>('fuse_fs_init'))(
@@ -973,7 +1164,7 @@ class DartFuse {
   _dart_fuse_fs_destroy? _fuse_fs_destroy;
 
   int fuse_notify_poll(
-    ffi.Pointer<fuse_pollhandle_2> ph,
+    ffi.Pointer<fuse_pollhandle> ph,
   ) {
     return (_fuse_notify_poll ??=
         _dylib.lookupFunction<_c_fuse_notify_poll, _dart_fuse_notify_poll>(
@@ -1136,6 +1327,423 @@ class DartFuse {
   _dart_fuse_get_session? _fuse_get_session;
 }
 
+/// Information about open files
+///
+/// Changed in version 2.5
+class fuse_file_info extends ffi.Struct {}
+
+/// Connection information, passed to the ->init() method
+///
+/// Some of the elements are read-write, these can be changed to
+/// indicate the value requested by the filesystem.  The requested
+/// value must usually be smaller than the indicated value.
+class fuse_conn_info extends ffi.Struct {
+  /// Major version of the protocol (read-only)
+  @ffi.Uint32()
+  external int proto_major;
+
+  /// Minor version of the protocol (read-only)
+  @ffi.Uint32()
+  external int proto_minor;
+
+  /// Is asynchronous read supported (read-write)
+  @ffi.Uint32()
+  external int async_read;
+
+  /// Maximum size of the write buffer
+  @ffi.Uint32()
+  external int max_write;
+
+  /// Maximum readahead
+  @ffi.Uint32()
+  external int max_readahead;
+
+  /// Capability flags, that the kernel supports
+  @ffi.Uint32()
+  external int capable;
+
+  /// Capability flags, that the filesystem wants to enable
+  @ffi.Uint32()
+  external int want;
+
+  /// Maximum number of backgrounded requests
+  @ffi.Uint32()
+  external int max_background;
+
+  /// Kernel congestion threshold parameter
+  @ffi.Uint32()
+  external int congestion_threshold;
+
+  @ffi.Uint32()
+  external int _unique_reserved_item_0;
+  @ffi.Uint32()
+  external int _unique_reserved_item_1;
+  @ffi.Uint32()
+  external int _unique_reserved_item_2;
+  @ffi.Uint32()
+  external int _unique_reserved_item_3;
+  @ffi.Uint32()
+  external int _unique_reserved_item_4;
+  @ffi.Uint32()
+  external int _unique_reserved_item_5;
+  @ffi.Uint32()
+  external int _unique_reserved_item_6;
+  @ffi.Uint32()
+  external int _unique_reserved_item_7;
+  @ffi.Uint32()
+  external int _unique_reserved_item_8;
+  @ffi.Uint32()
+  external int _unique_reserved_item_9;
+  @ffi.Uint32()
+  external int _unique_reserved_item_10;
+  @ffi.Uint32()
+  external int _unique_reserved_item_11;
+  @ffi.Uint32()
+  external int _unique_reserved_item_12;
+  @ffi.Uint32()
+  external int _unique_reserved_item_13;
+  @ffi.Uint32()
+  external int _unique_reserved_item_14;
+  @ffi.Uint32()
+  external int _unique_reserved_item_15;
+  @ffi.Uint32()
+  external int _unique_reserved_item_16;
+  @ffi.Uint32()
+  external int _unique_reserved_item_17;
+  @ffi.Uint32()
+  external int _unique_reserved_item_18;
+  @ffi.Uint32()
+  external int _unique_reserved_item_19;
+  @ffi.Uint32()
+  external int _unique_reserved_item_20;
+  @ffi.Uint32()
+  external int _unique_reserved_item_21;
+  @ffi.Uint32()
+  external int _unique_reserved_item_22;
+
+  /// Helper for array `reserved`.
+  ArrayHelper_fuse_conn_info_reserved_level0 get reserved =>
+      ArrayHelper_fuse_conn_info_reserved_level0(this, [23], 0, 0);
+}
+
+/// Helper for array `reserved` in struct `fuse_conn_info`.
+class ArrayHelper_fuse_conn_info_reserved_level0 {
+  final fuse_conn_info _struct;
+  final List<int> dimensions;
+  final int level;
+  final int _absoluteIndex;
+  int get length => dimensions[level];
+  ArrayHelper_fuse_conn_info_reserved_level0(
+      this._struct, this.dimensions, this.level, this._absoluteIndex);
+  void _checkBounds(int index) {
+    if (index >= length || index < 0) {
+      throw RangeError(
+          'Dimension $level: index not in range 0..${length} exclusive.');
+    }
+  }
+
+  int operator [](int index) {
+    _checkBounds(index);
+    switch (_absoluteIndex + index) {
+      case 0:
+        return _struct._unique_reserved_item_0;
+      case 1:
+        return _struct._unique_reserved_item_1;
+      case 2:
+        return _struct._unique_reserved_item_2;
+      case 3:
+        return _struct._unique_reserved_item_3;
+      case 4:
+        return _struct._unique_reserved_item_4;
+      case 5:
+        return _struct._unique_reserved_item_5;
+      case 6:
+        return _struct._unique_reserved_item_6;
+      case 7:
+        return _struct._unique_reserved_item_7;
+      case 8:
+        return _struct._unique_reserved_item_8;
+      case 9:
+        return _struct._unique_reserved_item_9;
+      case 10:
+        return _struct._unique_reserved_item_10;
+      case 11:
+        return _struct._unique_reserved_item_11;
+      case 12:
+        return _struct._unique_reserved_item_12;
+      case 13:
+        return _struct._unique_reserved_item_13;
+      case 14:
+        return _struct._unique_reserved_item_14;
+      case 15:
+        return _struct._unique_reserved_item_15;
+      case 16:
+        return _struct._unique_reserved_item_16;
+      case 17:
+        return _struct._unique_reserved_item_17;
+      case 18:
+        return _struct._unique_reserved_item_18;
+      case 19:
+        return _struct._unique_reserved_item_19;
+      case 20:
+        return _struct._unique_reserved_item_20;
+      case 21:
+        return _struct._unique_reserved_item_21;
+      case 22:
+        return _struct._unique_reserved_item_22;
+      default:
+        throw Exception('Invalid Array Helper generated.');
+    }
+  }
+
+  void operator []=(int index, int value) {
+    _checkBounds(index);
+    switch (_absoluteIndex + index) {
+      case 0:
+        _struct._unique_reserved_item_0 = value;
+        break;
+      case 1:
+        _struct._unique_reserved_item_1 = value;
+        break;
+      case 2:
+        _struct._unique_reserved_item_2 = value;
+        break;
+      case 3:
+        _struct._unique_reserved_item_3 = value;
+        break;
+      case 4:
+        _struct._unique_reserved_item_4 = value;
+        break;
+      case 5:
+        _struct._unique_reserved_item_5 = value;
+        break;
+      case 6:
+        _struct._unique_reserved_item_6 = value;
+        break;
+      case 7:
+        _struct._unique_reserved_item_7 = value;
+        break;
+      case 8:
+        _struct._unique_reserved_item_8 = value;
+        break;
+      case 9:
+        _struct._unique_reserved_item_9 = value;
+        break;
+      case 10:
+        _struct._unique_reserved_item_10 = value;
+        break;
+      case 11:
+        _struct._unique_reserved_item_11 = value;
+        break;
+      case 12:
+        _struct._unique_reserved_item_12 = value;
+        break;
+      case 13:
+        _struct._unique_reserved_item_13 = value;
+        break;
+      case 14:
+        _struct._unique_reserved_item_14 = value;
+        break;
+      case 15:
+        _struct._unique_reserved_item_15 = value;
+        break;
+      case 16:
+        _struct._unique_reserved_item_16 = value;
+        break;
+      case 17:
+        _struct._unique_reserved_item_17 = value;
+        break;
+      case 18:
+        _struct._unique_reserved_item_18 = value;
+        break;
+      case 19:
+        _struct._unique_reserved_item_19 = value;
+        break;
+      case 20:
+        _struct._unique_reserved_item_20 = value;
+        break;
+      case 21:
+        _struct._unique_reserved_item_21 = value;
+        break;
+      case 22:
+        _struct._unique_reserved_item_22 = value;
+        break;
+      default:
+        throw Exception('Invalid Array Helper generated.');
+    }
+  }
+}
+
+class fuse_session extends ffi.Struct {}
+
+class fuse_chan extends ffi.Struct {}
+
+class fuse_pollhandle extends ffi.Struct {}
+
+/// Argument list
+class fuse_args extends ffi.Struct {
+  /// Argument count
+  @ffi.Int32()
+  external int argc;
+
+  /// Argument vector.  NULL terminated
+  external ffi.Pointer<ffi.Pointer<ffi.Int8>> argv;
+
+  /// Is 'argv' allocated?
+  @ffi.Int32()
+  external int allocated;
+}
+
+/// Buffer flags
+abstract class fuse_buf_flags {
+  /// Buffer contains a file descriptor
+  ///
+  /// If this flag is set, the .fd field is valid, otherwise the
+  /// .mem fields is valid.
+  static const int FUSE_BUF_IS_FD = 2;
+
+  /// Seek on the file descriptor
+  ///
+  /// If this flag is set then the .pos field is valid and is
+  /// used to seek to the given offset before performing
+  /// operation on file descriptor.
+  static const int FUSE_BUF_FD_SEEK = 4;
+
+  /// Retry operation on file descriptor
+  ///
+  /// If this flag is set then retry operation on file descriptor
+  /// until .size bytes have been copied or an error or EOF is
+  /// detected.
+  static const int FUSE_BUF_FD_RETRY = 8;
+}
+
+/// Buffer copy flags
+abstract class fuse_buf_copy_flags {
+  /// Don't use splice(2)
+  ///
+  /// Always fall back to using read and write instead of
+  /// splice(2) to copy data from one file descriptor to another.
+  ///
+  /// If this flag is not set, then only fall back if splice is
+  /// unavailable.
+  static const int FUSE_BUF_NO_SPLICE = 2;
+
+  /// Force splice
+  ///
+  /// Always use splice(2) to copy data from one file descriptor
+  /// to another.  If splice is not available, return -EINVAL.
+  static const int FUSE_BUF_FORCE_SPLICE = 4;
+
+  /// Try to move data with splice.
+  ///
+  /// If splice is used, try to move pages from the source to the
+  /// destination instead of copying.  See documentation of
+  /// SPLICE_F_MOVE in splice(2) man page.
+  static const int FUSE_BUF_SPLICE_MOVE = 8;
+
+  /// Don't block on the pipe when copying data with splice
+  ///
+  /// Makes the operations on the pipe non-blocking (if the pipe
+  /// is full or empty).  See SPLICE_F_NONBLOCK in the splice(2)
+  /// man page.
+  static const int FUSE_BUF_SPLICE_NONBLOCK = 16;
+}
+
+/// Single data buffer
+///
+/// Generic data buffer for I/O, extended attributes, etc...  Data may
+/// be supplied as a memory pointer or as a file descriptor
+class fuse_buf extends ffi.Struct {
+  /// Size of data in bytes
+  @ffi.Int32()
+  external int size;
+
+  /// Buffer flags
+  @ffi.Int32()
+  external int flags;
+
+  /// Memory pointer
+  ///
+  /// Used unless FUSE_BUF_IS_FD flag is set.
+  external ffi.Pointer<ffi.Void> mem;
+
+  /// File descriptor
+  ///
+  /// Used if FUSE_BUF_IS_FD flag is set.
+  @ffi.Int32()
+  external int fd;
+
+  /// File position
+  ///
+  /// Used if FUSE_BUF_FD_SEEK flag is set.
+  @ffi.Int64()
+  external int pos;
+}
+
+/// Data buffer vector
+///
+/// An array of data buffers, each containing a memory pointer or a
+/// file descriptor.
+///
+/// Allocate dynamically to add more than one buffer.
+class fuse_bufvec extends ffi.Struct {
+  /// Number of buffers in the array
+  @ffi.Int32()
+  external int count;
+
+  /// Index of current buffer within the array
+  @ffi.Int32()
+  external int idx;
+
+  /// Current offset within the current buffer
+  @ffi.Int32()
+  external int off;
+
+  external fuse_buf _unique_buf_item_0;
+
+  /// Helper for array `buf`.
+  ArrayHelper_fuse_bufvec_buf_level0 get buf =>
+      ArrayHelper_fuse_bufvec_buf_level0(this, [1], 0, 0);
+}
+
+/// Helper for array `buf` in struct `fuse_bufvec`.
+class ArrayHelper_fuse_bufvec_buf_level0 {
+  final fuse_bufvec _struct;
+  final List<int> dimensions;
+  final int level;
+  final int _absoluteIndex;
+  int get length => dimensions[level];
+  ArrayHelper_fuse_bufvec_buf_level0(
+      this._struct, this.dimensions, this.level, this._absoluteIndex);
+  void _checkBounds(int index) {
+    if (index >= length || index < 0) {
+      throw RangeError(
+          'Dimension $level: index not in range 0..${length} exclusive.');
+    }
+  }
+
+  fuse_buf operator [](int index) {
+    _checkBounds(index);
+    switch (_absoluteIndex + index) {
+      case 0:
+        return _struct._unique_buf_item_0;
+      default:
+        throw Exception('Invalid Array Helper generated.');
+    }
+  }
+
+  void operator []=(int index, fuse_buf value) {
+    _checkBounds(index);
+    switch (_absoluteIndex + index) {
+      case 0:
+        _struct._unique_buf_item_0 = value;
+        break;
+      default:
+        throw Exception('Invalid Array Helper generated.');
+    }
+  }
+}
+
 /// Handle for a FUSE filesystem
 class fuse extends ffi.Struct {}
 
@@ -1260,8 +1868,6 @@ class utimbuf extends ffi.Struct {
   external int modtime;
 }
 
-class fuse_file_info extends ffi.Struct {}
-
 class statvfs extends ffi.Struct {
   @ffi.Uint64()
   external int f_bsize;
@@ -1377,8 +1983,6 @@ class ArrayHelper_statvfs___f_spare_level0 {
   }
 }
 
-class fuse_conn_info extends ffi.Struct {}
-
 class flock extends ffi.Struct {
   @ffi.Int16()
   external int l_type;
@@ -1395,10 +1999,6 @@ class flock extends ffi.Struct {
   @ffi.Int32()
   external int l_pid;
 }
-
-class fuse_pollhandle extends ffi.Struct {}
-
-class fuse_bufvec extends ffi.Struct {}
 
 /// The file system operations:
 ///
@@ -1838,66 +2438,10 @@ class fuse_operations extends ffi.Struct {
   external ffi.Pointer<ffi.NativeFunction<_typedefC_44>> fallocate;
 }
 
-class fuse_chan extends ffi.Struct {}
-
-class fuse_args extends ffi.Struct {}
-
 /// Fuse filesystem object
 ///
 /// This is opaque object represents a filesystem layer
 class fuse_fs extends ffi.Struct {}
-
-class fuse_file_info_1 extends ffi.Struct {}
-
-class fuse_file_info_2 extends ffi.Struct {}
-
-class fuse_file_info_3 extends ffi.Struct {}
-
-class fuse_file_info_4 extends ffi.Struct {}
-
-class fuse_bufvec_1 extends ffi.Struct {}
-
-class fuse_file_info_5 extends ffi.Struct {}
-
-class fuse_file_info_6 extends ffi.Struct {}
-
-class fuse_bufvec_2 extends ffi.Struct {}
-
-class fuse_file_info_7 extends ffi.Struct {}
-
-class fuse_file_info_8 extends ffi.Struct {}
-
-class fuse_file_info_9 extends ffi.Struct {}
-
-class fuse_file_info_10 extends ffi.Struct {}
-
-class fuse_file_info_11 extends ffi.Struct {}
-
-class fuse_file_info_12 extends ffi.Struct {}
-
-class fuse_file_info_13 extends ffi.Struct {}
-
-class fuse_file_info_14 extends ffi.Struct {}
-
-class fuse_file_info_15 extends ffi.Struct {}
-
-class fuse_file_info_16 extends ffi.Struct {}
-
-class fuse_file_info_17 extends ffi.Struct {}
-
-class fuse_file_info_18 extends ffi.Struct {}
-
-class fuse_file_info_19 extends ffi.Struct {}
-
-class fuse_pollhandle_1 extends ffi.Struct {}
-
-class fuse_file_info_20 extends ffi.Struct {}
-
-class fuse_conn_info_1 extends ffi.Struct {}
-
-class fuse_pollhandle_2 extends ffi.Struct {}
-
-class fuse_args_1 extends ffi.Struct {}
 
 class fusemod_so extends ffi.Struct {}
 
@@ -1935,9 +2479,135 @@ class fuse_module extends ffi.Struct {
   external int ctr;
 }
 
-class fuse_session extends ffi.Struct {}
-
 const int FUSE_USE_VERSION = 21;
+
+const int FUSE_MAJOR_VERSION = 2;
+
+const int FUSE_MINOR_VERSION = 1;
+
+const int FUSE_VERSION = 21;
+
+const int FUSE_CAP_ASYNC_READ = 1;
+
+const int FUSE_CAP_POSIX_LOCKS = 2;
+
+const int FUSE_CAP_ATOMIC_O_TRUNC = 8;
+
+const int FUSE_CAP_EXPORT_SUPPORT = 16;
+
+const int FUSE_CAP_BIG_WRITES = 32;
+
+const int FUSE_CAP_DONT_MASK = 64;
+
+const int FUSE_CAP_SPLICE_WRITE = 128;
+
+const int FUSE_CAP_SPLICE_MOVE = 256;
+
+const int FUSE_CAP_SPLICE_READ = 512;
+
+const int FUSE_CAP_FLOCK_LOCKS = 1024;
+
+const int FUSE_CAP_IOCTL_DIR = 2048;
+
+const int FUSE_IOCTL_COMPAT = 1;
+
+const int FUSE_IOCTL_UNRESTRICTED = 2;
+
+const int FUSE_IOCTL_RETRY = 4;
+
+const int FUSE_IOCTL_DIR = 16;
+
+const int FUSE_IOCTL_MAX_IOV = 256;
+
+typedef _c_fuse_mount = ffi.Pointer<fuse_chan> Function(
+  ffi.Pointer<ffi.Int8> mountpoint,
+  ffi.Pointer<fuse_args> args,
+);
+
+typedef _dart_fuse_mount = ffi.Pointer<fuse_chan> Function(
+  ffi.Pointer<ffi.Int8> mountpoint,
+  ffi.Pointer<fuse_args> args,
+);
+
+typedef _c_fuse_unmount = ffi.Void Function(
+  ffi.Pointer<ffi.Int8> mountpoint,
+  ffi.Pointer<fuse_chan> ch,
+);
+
+typedef _dart_fuse_unmount = void Function(
+  ffi.Pointer<ffi.Int8> mountpoint,
+  ffi.Pointer<fuse_chan> ch,
+);
+
+typedef _c_fuse_parse_cmdline = ffi.Int32 Function(
+  ffi.Pointer<fuse_args> args,
+  ffi.Pointer<ffi.Pointer<ffi.Int8>> mountpoint,
+  ffi.Pointer<ffi.Int32> multithreaded,
+  ffi.Pointer<ffi.Int32> foreground,
+);
+
+typedef _dart_fuse_parse_cmdline = int Function(
+  ffi.Pointer<fuse_args> args,
+  ffi.Pointer<ffi.Pointer<ffi.Int8>> mountpoint,
+  ffi.Pointer<ffi.Int32> multithreaded,
+  ffi.Pointer<ffi.Int32> foreground,
+);
+
+typedef _c_fuse_daemonize = ffi.Int32 Function(
+  ffi.Int32 foreground,
+);
+
+typedef _dart_fuse_daemonize = int Function(
+  int foreground,
+);
+
+typedef _c_fuse_version = ffi.Int32 Function();
+
+typedef _dart_fuse_version = int Function();
+
+typedef _c_fuse_pollhandle_destroy = ffi.Void Function(
+  ffi.Pointer<fuse_pollhandle> ph,
+);
+
+typedef _dart_fuse_pollhandle_destroy = void Function(
+  ffi.Pointer<fuse_pollhandle> ph,
+);
+
+typedef _c_fuse_buf_size = ffi.Int32 Function(
+  ffi.Pointer<fuse_bufvec> bufv,
+);
+
+typedef _dart_fuse_buf_size = int Function(
+  ffi.Pointer<fuse_bufvec> bufv,
+);
+
+typedef _c_fuse_buf_copy = ffi.Int64 Function(
+  ffi.Pointer<fuse_bufvec> dst,
+  ffi.Pointer<fuse_bufvec> src,
+  ffi.Int32 flags,
+);
+
+typedef _dart_fuse_buf_copy = int Function(
+  ffi.Pointer<fuse_bufvec> dst,
+  ffi.Pointer<fuse_bufvec> src,
+  int flags,
+);
+
+typedef _c_fuse_set_signal_handlers = ffi.Int32 Function(
+  ffi.Pointer<fuse_session> se,
+);
+
+typedef _dart_fuse_set_signal_handlers = int Function(
+  ffi.Pointer<fuse_session> se,
+);
+
+typedef _c_fuse_remove_signal_handlers = ffi.Void Function(
+  ffi.Pointer<fuse_session> se,
+);
+
+typedef _dart_fuse_remove_signal_handlers = void Function(
+  ffi.Pointer<fuse_session> se,
+);
 
 typedef _c_fuse_new = ffi.Pointer<fuse> Function(
   ffi.Pointer<fuse_chan> ch,
@@ -2059,14 +2729,14 @@ typedef _c_fuse_fs_fgetattr = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Pointer<stat> buf,
-  ffi.Pointer<fuse_file_info_1> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_fgetattr = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Pointer<stat> buf,
-  ffi.Pointer<fuse_file_info_1> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_rename = ffi.Int32 Function(
@@ -2128,25 +2798,25 @@ typedef _dart_fuse_fs_link = int Function(
 typedef _c_fuse_fs_release = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_2> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_release = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_2> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_open = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_3> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_open = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_3> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_read = ffi.Int32 Function(
@@ -2155,7 +2825,7 @@ typedef _c_fuse_fs_read = ffi.Int32 Function(
   ffi.Pointer<ffi.Int8> buf,
   ffi.Int32 size,
   ffi.Int64 off,
-  ffi.Pointer<fuse_file_info_4> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_read = int Function(
@@ -2164,25 +2834,25 @@ typedef _dart_fuse_fs_read = int Function(
   ffi.Pointer<ffi.Int8> buf,
   int size,
   int off,
-  ffi.Pointer<fuse_file_info_4> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_read_buf = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<ffi.Pointer<fuse_bufvec_1>> bufp,
+  ffi.Pointer<ffi.Pointer<fuse_bufvec>> bufp,
   ffi.Int32 size,
   ffi.Int64 off,
-  ffi.Pointer<fuse_file_info_5> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_read_buf = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<ffi.Pointer<fuse_bufvec_1>> bufp,
+  ffi.Pointer<ffi.Pointer<fuse_bufvec>> bufp,
   int size,
   int off,
-  ffi.Pointer<fuse_file_info_5> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_write = ffi.Int32 Function(
@@ -2191,7 +2861,7 @@ typedef _c_fuse_fs_write = ffi.Int32 Function(
   ffi.Pointer<ffi.Int8> buf,
   ffi.Int32 size,
   ffi.Int64 off,
-  ffi.Pointer<fuse_file_info_6> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_write = int Function(
@@ -2200,49 +2870,49 @@ typedef _dart_fuse_fs_write = int Function(
   ffi.Pointer<ffi.Int8> buf,
   int size,
   int off,
-  ffi.Pointer<fuse_file_info_6> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_write_buf = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_bufvec_2> buf,
+  ffi.Pointer<fuse_bufvec> buf,
   ffi.Int64 off,
-  ffi.Pointer<fuse_file_info_7> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_write_buf = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_bufvec_2> buf,
+  ffi.Pointer<fuse_bufvec> buf,
   int off,
-  ffi.Pointer<fuse_file_info_7> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_fsync = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Int32 datasync,
-  ffi.Pointer<fuse_file_info_8> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_fsync = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   int datasync,
-  ffi.Pointer<fuse_file_info_8> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_flush = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_9> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_flush = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_9> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_statfs = ffi.Int32 Function(
@@ -2260,13 +2930,13 @@ typedef _dart_fuse_fs_statfs = int Function(
 typedef _c_fuse_fs_opendir = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_10> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_opendir = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_10> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef fuse_fill_dir_t = ffi.Int32 Function(
@@ -2282,7 +2952,7 @@ typedef _c_fuse_fs_readdir = ffi.Int32 Function(
   ffi.Pointer<ffi.Void> buf,
   ffi.Pointer<ffi.NativeFunction<fuse_fill_dir_t>> filler,
   ffi.Int64 off,
-  ffi.Pointer<fuse_file_info_11> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_readdir = int Function(
@@ -2291,53 +2961,53 @@ typedef _dart_fuse_fs_readdir = int Function(
   ffi.Pointer<ffi.Void> buf,
   ffi.Pointer<ffi.NativeFunction<fuse_fill_dir_t>> filler,
   int off,
-  ffi.Pointer<fuse_file_info_11> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_fsyncdir = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Int32 datasync,
-  ffi.Pointer<fuse_file_info_12> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_fsyncdir = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   int datasync,
-  ffi.Pointer<fuse_file_info_12> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_releasedir = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_13> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_releasedir = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_13> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_create = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Uint32 mode,
-  ffi.Pointer<fuse_file_info_14> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_create = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   int mode,
-  ffi.Pointer<fuse_file_info_14> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_lock = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_15> fi,
+  ffi.Pointer<fuse_file_info> fi,
   ffi.Int32 cmd,
   ffi.Pointer<flock> lock,
 );
@@ -2345,7 +3015,7 @@ typedef _c_fuse_fs_lock = ffi.Int32 Function(
 typedef _dart_fuse_fs_lock = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_15> fi,
+  ffi.Pointer<fuse_file_info> fi,
   int cmd,
   ffi.Pointer<flock> lock,
 );
@@ -2353,14 +3023,14 @@ typedef _dart_fuse_fs_lock = int Function(
 typedef _c_fuse_fs_flock = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_16> fi,
+  ffi.Pointer<fuse_file_info> fi,
   ffi.Int32 op,
 );
 
 typedef _dart_fuse_fs_flock = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_16> fi,
+  ffi.Pointer<fuse_file_info> fi,
   int op,
 );
 
@@ -2406,14 +3076,14 @@ typedef _c_fuse_fs_ftruncate = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Int64 size,
-  ffi.Pointer<fuse_file_info_17> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_ftruncate = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   int size,
-  ffi.Pointer<fuse_file_info_17> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_utimens = ffi.Int32 Function(
@@ -2544,14 +3214,14 @@ typedef _c_fuse_fs_bmap = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   ffi.Int32 blocksize,
-  ffi.Pointer<ffi.Int32> idx,
+  ffi.Pointer<ffi.Uint64> idx,
 );
 
 typedef _dart_fuse_fs_bmap = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
   int blocksize,
-  ffi.Pointer<ffi.Int32> idx,
+  ffi.Pointer<ffi.Uint64> idx,
 );
 
 typedef _c_fuse_fs_ioctl = ffi.Int32 Function(
@@ -2559,7 +3229,7 @@ typedef _c_fuse_fs_ioctl = ffi.Int32 Function(
   ffi.Pointer<ffi.Int8> path,
   ffi.Int32 cmd,
   ffi.Pointer<ffi.Void> arg,
-  ffi.Pointer<fuse_file_info_18> fi,
+  ffi.Pointer<fuse_file_info> fi,
   ffi.Uint32 flags,
   ffi.Pointer<ffi.Void> data,
 );
@@ -2569,7 +3239,7 @@ typedef _dart_fuse_fs_ioctl = int Function(
   ffi.Pointer<ffi.Int8> path,
   int cmd,
   ffi.Pointer<ffi.Void> arg,
-  ffi.Pointer<fuse_file_info_18> fi,
+  ffi.Pointer<fuse_file_info> fi,
   int flags,
   ffi.Pointer<ffi.Void> data,
 );
@@ -2577,16 +3247,16 @@ typedef _dart_fuse_fs_ioctl = int Function(
 typedef _c_fuse_fs_poll = ffi.Int32 Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_19> fi,
-  ffi.Pointer<fuse_pollhandle_1> ph,
+  ffi.Pointer<fuse_file_info> fi,
+  ffi.Pointer<fuse_pollhandle> ph,
   ffi.Pointer<ffi.Uint32> reventsp,
 );
 
 typedef _dart_fuse_fs_poll = int Function(
   ffi.Pointer<fuse_fs> fs,
   ffi.Pointer<ffi.Int8> path,
-  ffi.Pointer<fuse_file_info_19> fi,
-  ffi.Pointer<fuse_pollhandle_1> ph,
+  ffi.Pointer<fuse_file_info> fi,
+  ffi.Pointer<fuse_pollhandle> ph,
   ffi.Pointer<ffi.Uint32> reventsp,
 );
 
@@ -2596,7 +3266,7 @@ typedef _c_fuse_fs_fallocate = ffi.Int32 Function(
   ffi.Int32 mode,
   ffi.Int64 offset,
   ffi.Int64 length,
-  ffi.Pointer<fuse_file_info_20> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _dart_fuse_fs_fallocate = int Function(
@@ -2605,17 +3275,17 @@ typedef _dart_fuse_fs_fallocate = int Function(
   int mode,
   int offset,
   int length,
-  ffi.Pointer<fuse_file_info_20> fi,
+  ffi.Pointer<fuse_file_info> fi,
 );
 
 typedef _c_fuse_fs_init = ffi.Void Function(
   ffi.Pointer<fuse_fs> fs,
-  ffi.Pointer<fuse_conn_info_1> conn,
+  ffi.Pointer<fuse_conn_info> conn,
 );
 
 typedef _dart_fuse_fs_init = void Function(
   ffi.Pointer<fuse_fs> fs,
-  ffi.Pointer<fuse_conn_info_1> conn,
+  ffi.Pointer<fuse_conn_info> conn,
 );
 
 typedef _c_fuse_fs_destroy = ffi.Void Function(
@@ -2627,11 +3297,11 @@ typedef _dart_fuse_fs_destroy = void Function(
 );
 
 typedef _c_fuse_notify_poll = ffi.Int32 Function(
-  ffi.Pointer<fuse_pollhandle_2> ph,
+  ffi.Pointer<fuse_pollhandle> ph,
 );
 
 typedef _dart_fuse_notify_poll = int Function(
-  ffi.Pointer<fuse_pollhandle_2> ph,
+  ffi.Pointer<fuse_pollhandle> ph,
 );
 
 typedef _c_fuse_fs_new = ffi.Pointer<fuse_fs> Function(
@@ -2953,7 +3623,7 @@ typedef _typedefC_37 = ffi.Int32 Function(
 typedef _typedefC_38 = ffi.Int32 Function(
   ffi.Pointer<ffi.Int8>,
   ffi.Int32,
-  ffi.Pointer<ffi.Int32>,
+  ffi.Pointer<ffi.Uint64>,
 );
 
 typedef _typedefC_39 = ffi.Int32 Function(
@@ -3002,6 +3672,6 @@ typedef _typedefC_44 = ffi.Int32 Function(
 );
 
 typedef _typedefC_45 = ffi.Pointer<fuse_fs> Function(
-  ffi.Pointer<fuse_args_1>,
+  ffi.Pointer<fuse_args>,
   ffi.Pointer<ffi.Pointer<fuse_fs>>,
 );

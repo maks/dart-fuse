@@ -23,7 +23,7 @@
 #define FUSE_USE_VERSION 21
 #endif
 
-#include "fuse_common.h"
+#include "/usr/include/fuse/fuse_common.h"
 
 #include <fcntl.h>
 #include <time.h>
